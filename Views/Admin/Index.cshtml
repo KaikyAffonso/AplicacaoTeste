@@ -1,0 +1,40 @@
+﻿@model List<AplicacaoTeste.Models.User>
+
+<h2>Gestão de Usuários</h2>
+
+<table class="table table-bordered">
+    <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Status</th>
+            <th>Ação</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var u in Model)
+        {
+            <tr>
+                <td>@u.Id</td>
+                <td>@u.Username</td>
+                <td>@u.Status</td>
+                <td>
+                    @if (u.Status == AplicacaoTeste.Models.UserStatus.Pending)
+                    {
+                        <a asp-action="Approve"
+                           asp-route-id="@u.Id"
+                           class="btn btn-sm btn-success">
+                            Aprovar
+                        </a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-controller="Product"
+   asp-action="Index"
+   class="btn btn-secondary">
+    Voltar
+</a>
