@@ -1,4 +1,8 @@
+using AplicacaoTeste.Data;
 using AplicacaoTeste.Services;
+using Microsoft.EntityFrameworkCore;
+using AplicacaoTeste.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace AplicacaoTeste
 {
@@ -13,9 +17,12 @@ namespace AplicacaoTeste
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
-            builder.Services.AddSingleton<ProductService>();
-            builder.Services.AddSingleton<UserService>();
+            builder.Services.AddScoped<ProductService>();
+            builder.Services.AddScoped<UserService>();
+
             builder.Services.AddSession();
+            builder.Services.AddDbContext<ApplicationDbContext>(options =>
+            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
             var app = builder.Build();

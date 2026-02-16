@@ -1,54 +1,60 @@
-﻿using AplicacaoTeste.Models;
+﻿using AplicacaoTeste.Data;
+using AplicacaoTeste.Models;
 
 namespace AplicacaoTeste.Services
 {
     public class UserService
     {
+        private readonly ApplicationDbContext _context;
 
-
-        private List<User> users = new List<User>();
-        private int nextId = 1;
-
-        public UserService()
+        public UserService(ApplicationDbContext context)
         {
-            users.Add(new User
+            _context = context;
+
+            // Criar admin se não existir
+            if (!_context.Users.Any())
             {
-                Id = nextId++,
-                Username = "admin",
-                Password = "123",
-                Role = "Admin",
-                Status = UserStatus.Active
-            });
+                _context.Users.Add(new User
+                {
+                    Username = "admin",
+                    Password = "123",
+                    Role = "Admin",
+                    Status = UserStatus.Active
+                });
+
+                _context.SaveChanges();
+            }
         }
 
-        public List<User> GetAll() => users;
+        public List<User> GetAll() => _context.Users.ToList();
 
         public void Register(string username, string password)
         {
-            users.Add(new User
+            var user = new User
             {
-                Id = nextId++,
                 Username = username,
                 Password = password,
                 Role = "User",
                 Status = UserStatus.Pending
-            });
-        }
+            };
 
+            _context.Users.Add(user);
+            _context.SaveChanges();
+        }
 
         public void Approve(int id)
         {
-            var user = users.Find(u => u.Id == id);
+            var user = _context.Users.Find(id);
             if (user == null) return;
 
             user.Status = UserStatus.Active;
+            _context.SaveChanges();
         }
 
         public User Authenticate(string username, string password)
         {
-            var user = users.Find(u =>
-                u.Username == username &&
-                u.Password == password);
+            var user = _context.Users
+                .FirstOrDefault(u => u.Username == username && u.Password == password);
 
             if (user == null)
                 return null;
@@ -61,6 +67,5 @@ namespace AplicacaoTeste.Services
 
             return user;
         }
-
     }
 }

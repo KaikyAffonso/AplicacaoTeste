@@ -1,48 +1,57 @@
-﻿using AplicacaoTeste.Models;
+﻿using AplicacaoTeste.Data;
+using AplicacaoTeste.Models;
 
 namespace AplicacaoTeste.Services
 {
     public class ProductService
     {
-        private List<Product> products = new List<Product>();
-        private int nextId = 1;
+        private readonly ApplicationDbContext _context;
+
+        public ProductService(ApplicationDbContext context)
+        {
+            _context = context;
+        }
 
         public List<Product> GetAll()
         {
-            return products;
+            return _context.Products.ToList();
         }
 
         public void Create(string name, decimal price, int quantity, string username)
         {
-            products.Add(new Product
+            var product = new Product
             {
-                Id = nextId++,
                 Name = name,
                 Price = price,
                 Quantity = quantity,
+                Active = true,
                 LastModifiedBy = username
-            });
-        }
+            };
 
+            _context.Products.Add(product);
+            _context.SaveChanges();
+        }
 
         public void Update(int id, string name, decimal price, int quantity, string username)
         {
-            var product = products.Find(p => p.Id == id);
+            var product = _context.Products.Find(id);
             if (product == null) return;
 
             product.Name = name;
             product.Price = price;
             product.Quantity = quantity;
             product.LastModifiedBy = username;
-        }
 
+            _context.SaveChanges();
+        }
 
         public void Deactivate(int id)
         {
-            var product = products.Find(p => p.Id == id);
+            var product = _context.Products.Find(id);
             if (product == null) return;
 
             product.Active = false;
+            _context.SaveChanges();
         }
     }
 }
